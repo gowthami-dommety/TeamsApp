@@ -1,2 +1,2 @@
-# tradeshiftTeamsApp
+# TeamsApp
 Teams App Project
