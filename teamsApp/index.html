@@ -51,7 +51,7 @@
 			</tr>
 		</thead>
 		<tbody>
-			<tr ng-repeat="team in teams" data-team-id="{{team.teamId}}" data-toggle="modal" data-target="#teamDetailsModal">
+			<tr ng-repeat="team in teams" data-team-id="{{team.teamId}}" class="team-row" data-toggle="modal" data-target="#teamDetailsModal">
 				<td>{{team.teamName}}</td>
 				<td>{{formatEmpList(team.members)}}</td>
 				<td>{{team.numberOfMembers}}</td>
@@ -59,7 +59,7 @@
 		</tbody>
 	</table>
 	
-	<div class="modal fade" id="teamDetailsModal" tabindex="-1" role="dialog" aria-labelledby="createTeamLabel">
+	<div team-details class="modal fade" id="teamDetailsModal" tabindex="-1" role="dialog" aria-labelledby="createTeamLabel">
 	  <div class="modal-dialog" role="document">
 		<div class="modal-content">
 		  <div class="modal-header">

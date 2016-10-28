@@ -6,8 +6,7 @@ $(document).ready(function() {
 });
 
 
-angular.module('TeamApp', [])
-.controller('MainController', function($scope, $http) {
+var TeamApp = angular.module('TeamApp', []).controller('MainController', function($scope, $http) {
 	$scope.currentTeamId = null;
 	
     $http.get('http://demo5534716.mockable.io/retrieveTeams').
@@ -16,7 +15,7 @@ angular.module('TeamApp', [])
         });
 		
 	$scope.SaveTeam = function () {
-			var selectedEmployees = $('#employeeSelect').select2('data').map(function(item){console.log(item); return item.id;});
+			var selectedEmployees = $('#employeeSelect').select2('data').map(function(item){return item.id;});
 
             var data = {
                 teamName: $scope.teamName,
@@ -27,7 +26,7 @@ angular.module('TeamApp', [])
 
             $http.post('http://demo5534716.mockable.io/saveTeam', data)
             .success(function () {
-                (data.teamId) ? updateTeam(data.teamId, data) : createTeam(data);
+                (data.teamId) ? updateTeam($scope, data.teamId, data) : createTeam($scope, data);
 				$('#teamDetailsModal').modal('hide');
             });
         };
@@ -35,40 +34,60 @@ angular.module('TeamApp', [])
 	$scope.formatEmpList = function(empArray) {
 		return empArray.join(", ");
 	};
-	
-	$('#teamDetailsModal').on('show.bs.modal', function (event) {
-	  var teamId = $(event.relatedTarget).data('team-id');
-	  $scope.currentTeamId = teamId;
-	  if(teamId) {
-		  var teamSelected = _.findWhere($scope.teams, {teamId: teamId});
-		  $scope.$apply(function () {
-            $scope.teamName = teamSelected.teamName;
-          });
-		  $scope.$apply();
-		  $('#employeeSelect').val(teamSelected.members).trigger("change");
-	  }
-	});
-	
-	$('#teamDetailsModal').on('hidden.bs.modal', function () {
-		//clear dialog fields
-		$scope.$apply(function () {
-          $scope.teamName = "";
-        });
-		$('#employeeSelect').val("").trigger("change");
-	});
-	
-	function updateTeam(teamId, data) {
-		_.each($scope.teams, function(team) {
-			if(team.teamId == teamId) {
-				team.teamName = data.teamName;
-				team.members = data.members;
-				team.numberOfMembers = data.members.length;
-			}
-		});
-	};
-	
-	function createTeam(data) {
-		data.teamId = $scope.teams.length + 1;
-		$scope.teams.push(data);
-	};
 });
+
+TeamApp.directive('teamDetails', function() {
+	return {
+		restrict:'A',
+		link: function($scope, element, attrs) {
+			$('#teamDetailsModal').on('show.bs.modal', function (event) {
+			  var teamId = $(event.relatedTarget).data('team-id');
+			  $scope.currentTeamId = teamId;
+			  if(teamId) {
+				  var teamSelected = _.findWhere($scope.teams, {teamId: teamId});
+				  $scope.$apply(function () {
+					$scope.teamName = teamSelected.teamName;
+				  });
+				  $scope.$apply();
+				  $('#employeeSelect').val(teamSelected.members).trigger("change");
+			  }
+			});
+	
+			$('#teamDetailsModal').on('hidden.bs.modal', function () {
+				//clear dialog fields
+				$scope.$apply(function () {
+				  $scope.teamName = "";
+				});
+				$('#employeeSelect').val("").trigger("change");
+			});
+		}
+	}
+});
+
+TeamApp.directive('teamRow', function() {
+	return {
+		restrict:'C',
+		link: function($scope, element, attrs) {
+			$(element).hover(function(){
+				$(element).addClass("active");
+			}, function(){
+				$(element).removeClass("active");
+			});
+		}
+	}
+});
+
+function updateTeam($scope, teamId, data) {
+	_.each($scope.teams, function(team) {
+		if(team.teamId == teamId) {
+			team.teamName = data.teamName;
+			team.members = data.members;
+			team.numberOfMembers = data.members.length;
+		}
+	});
+};
+
+function createTeam($scope, data) {
+	data.teamId = $scope.teams.length + 1;
+	$scope.teams.push(data);
+};
