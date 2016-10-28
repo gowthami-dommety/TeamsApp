@@ -1,0 +1,8 @@
+.container {
+	width: 98%;
+	margin-top: 5%;
+}
+
+.select2-container--default .select2-search--inline .select2-search__field {
+	width:100% !important;
+}
